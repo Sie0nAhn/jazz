@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Let's jazz it up</title>
+<style>
+body {
+    margin: 0;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+#backgroundVideo {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+}
+#logo {
+    position: absolute;
+    top: 24%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    width: 90%;
+    max-width: 500px;
+}
+.controls {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    bottom: 0;
+    left: 20px;
+    right: 20px;
+    margin-bottom: 10px;
+    z-index: 2;
+}
+.sticker {
+    position: absolute;
+    pointer-events: none;
+    opacity: 1;
+    transition: opacity 1s ease;
+    z-index: 1;
+    animation: move 2s infinite alternate; /* 기본 애니메이션 설정 */
+}
+.control {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 10px;
+}
+button {
+    background-color: black;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin-right: 10px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    font-family: 'Pretendard-SemiBold';
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 10px;
+    border-radius: 5px;
+    margin-left: 5px;
+}
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: white;
+    cursor: pointer;
+}
+@font-face {
+    font-family: 'Pretendard-SemiBold';
+    src: url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Bold.woff') format('woff');
+    font-weight: 600;
+    font-style: normal;
+}
+@keyframes move {
+    0% { transform: translate(0, 0); }
+    25% { transform: translate(10px, 0); }
+    50% { transform: translate(0, 10px); }
+    75% { transform: translate(-10px, 0); }
+    100% { transform: translate(0, -10px); }
+}
+</style>
+</head>
+<body>
+
+<video id="backgroundVideo" autoplay muted loop>
+<source src="jazz.mp4" type="video/mp4">
+</video>
+
+<img id="logo" src="logo.svg" alt="Logo">
+
+<div class="controls">
+<div class="control">
+<button id="bassSound">🎸Bass</button>
+<input id="bassVol" type="range" max="100" min="0" value="100">
+</div>
+<div class="control">
+<button id="drumSound">🥁Drum</button>
+<input id="drumVol" type="range" max="100" min="0" value="100">
+</div>
+<div class="control">
+<button id="piaSound">🎹Piano</button>
+<input id="piaVol" type="range" max="100" min="0" value="100">
+</div>
+<div class="control">
+<button id="trumSound">🎺Trumpet</button>
+<input id="trumVol" type="range" max="100" min="0" value="100">
+</div>
+</div>
+
+<script type="text/javascript">
+const bassVolControl = document.getElementById("bassVol");
+const drumVolControl = document.getElementById("drumVol");
+const piaVolControl = document.getElementById("piaVol");
+const trumVolControl = document.getElementById("trumVol");
+
+const stickersContainer = document.createElement("div");
+document.body.appendChild(stickersContainer);
+
+const bassStickers = [];
+const drumStickers = [];
+const pianoStickers = [];
+const trumpetStickers = [];
+
+const backgroundVideo = document.getElementById("backgroundVideo");
+
+// 오디오 요소 생성
+const bassSnd = new Audio('bass.mp3');
+const drumSnd = new Audio('drum.mp3');
+const piaSnd = new Audio('piano.mp3');
+const trumSnd = new Audio('trumpet.mp3');
+
+// 볼륨 조절 함수
+function setVolume(audioElement, volumeControl) {
+    audioElement.volume = volumeControl.value / 100;
+}
+
+// 슬라이더 색상 업데이트 함수
+function updateSliderColor(volumeControl) {
+    const volumeLevel = volumeControl.value / 100;
+    volumeControl.style.background = `linear-gradient(to right, magenta ${volumeLevel * 100}%, black ${volumeLevel * 100}%)`;
+}
+
+// 초기 색상 설정
+updateSliderColor(bassVolControl);
+updateSliderColor(drumVolControl);
+updateSliderColor(piaVolControl);
+updateSliderColor(trumVolControl);
+
+// 볼륨 조절 이벤트
+bassVolControl.oninput = () => handleVolumeChange(bassVolControl, bassSnd, bassSound, bassStickers, "bass");
+drumVolControl.oninput = () => handleVolumeChange(drumVolControl, drumSnd, drumSound, drumStickers, "drum");
+piaVolControl.oninput = () => handleVolumeChange(piaVolControl, piaSnd, piaSound, pianoStickers, "piano");
+trumVolControl.oninput = () => handleVolumeChange(trumVolControl, trumSnd, trumSound, trumpetStickers, "trumpet");
+
+// 버튼 클릭 시
+bassSound.onclick = function() {
+    toggleAudio(bassSnd, bassSound, bassVolControl, bassStickers, "bass");
+}
+drumSound.onclick = function() {
+    toggleAudio(drumSnd, drumSound, drumVolControl, drumStickers, "drum");
+}
+piaSound.onclick = function() {
+    toggleAudio(piaSnd, piaSound, piaVolControl, pianoStickers, "piano");
+}
+trumSound.onclick = function() {
+    toggleAudio(trumSnd, trumSound, trumVolControl, trumpetStickers, "trumpet");
+}
+
+function handleVolumeChange(volumeControl, audio, button, stickers, type) {
+    setVolume(audio, volumeControl);
+    updateSliderColor(volumeControl);
+
+    if (!button.classList.contains('active')) {
+        button.classList.add('active');
+        audio.play();
+        button.style.backgroundColor = "magenta";
+        button.style.color = "black";
+    }
+
+    manageVideoPlayback();
+
+    // 스티커 업데이트 (볼륨에 따라 개수 조절)
+    const stickerCount = Math.floor(volumeControl.value / 10);
+    updateStickers(stickers, stickerCount, type);
+}
+
+function toggleAudio(audio, button, volumeControl, stickers, type) {
+    if (button.classList.contains('active')) {
+        button.classList.remove('active');
+        audio.pause();
+        button.style.backgroundColor = ""; // 기본 배경색으로 변경
+        button.style.color = ""; // 기본 글자색으로 변경
+        clearStickers(stickers); // 스티커 제거
+    } else {
+        button.classList.add('active');
+        audio.play();
+        button.style.backgroundColor = "magenta"; // 버튼 색상 변경
+        button.style.color = "black"; // 버튼 글자 색상 변경
+        updateStickers(stickers, Math.floor(volumeControl.value / 10), type); // 스티커 업데이트
+    }
+    manageVideoPlayback();
+    setVolume(audio, volumeControl);
+    updateSliderColor(volumeControl);
+}
+
+function updateStickers(stickerArray, count, type) {
+    clearStickers(stickerArray);
+    for (let i = 0; i < count; i++) {
+        const sticker = document.createElement("img");
+        sticker.src = type === "bass" ? "bass.webp" : type === "drum" ? "drum.webp" : type === "piano" ? "piano.webp" : "trumpet.webp";
+        sticker.classList.add("sticker");
+        sticker.style.width = `${Math.random() * 15 + 2}vw`;
+        sticker.style.left = Math.random() * (window.innerWidth - 50) + "px";
+        sticker.style.top = Math.random() * (window.innerHeight - 100) + 50 + "px";
+        sticker.style.animation = `move ${Math.random() * 2 + 1}s infinite alternate`; // 애니메이션 적용
+        stickersContainer.appendChild(sticker);
+        stickerArray.push(sticker);
+    }
+}
+
+function clearStickers(stickerArray) {
+    stickerArray.forEach(sticker => {
+        sticker.style.opacity = "0";
+        setTimeout(() => {
+            stickersContainer.removeChild(sticker);
+        }, 1000);
+    });
+    stickerArray.length = 0;
+}
+
+// 오디오가 끝났을 때 자동 재생
+const audioElements = [bassSnd, drumSnd, piaSnd, trumSnd];
+const buttons = [bassSound, drumSound, piaSound, trumSound];
+
+audioElements.forEach((audio, index) => {
+    audio.addEventListener('ended', () => {
+        if (buttons[index].classList.contains('active')) {
+            audio.currentTime = 0;
+            audio.play();
+        }
+    });
+});
+
+function manageVideoPlayback() {
+    if (bassSound.classList.contains('active') || drumSound.classList.contains('active') || 
+        piaSound.classList.contains('active') || trumSound.classList.contains('active')) {
+        backgroundVideo.play();
+    } else {
+        backgroundVideo.pause();
+    }
+}
+</script>
+
+</body>
+</html>
+
